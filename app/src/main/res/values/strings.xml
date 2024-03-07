@@ -5,4 +5,5 @@
     <string name="add_item">Add Item</string>
     <string name="clear_all">Clear All</string>
     <string name="delete_checked">Delete Checked</string>
+    <string name="item">Item</string>
 </resources>
