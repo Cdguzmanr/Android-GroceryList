@@ -1,14 +1,21 @@
 package edu.fvtc.grocerylist;
 
+import static android.app.ProgressDialog.show;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -16,8 +23,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
     public static final String FILENAME = "data.txt";
     public static final String XMLFILENAME = "data.xml";
+    public ItemAdapter itemAdapter;
 
     ArrayList<Item> items;
+    ArrayList<Item> shoppingListItems;
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -39,10 +48,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d(TAG, "onCreate: ---------------------------- New Run --------------------------------------");
 
 
         // Added Methods:
-        createItems(); // Call method to generate items
+        //createItems(); // Call method to generate items
+
+        // Populate items
+        PopulateItems();
+
+
+
 
         // Adds current items in the class to an array
         ArrayList<String> descriptions = new ArrayList<String>();
@@ -55,14 +71,23 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView rvItems = findViewById(R.id.rvItems);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         rvItems.setLayoutManager(layoutManager);
-        ItemAdapter itemAdapter = new ItemAdapter(items, this);
+        itemAdapter = new ItemAdapter(items, this);
         itemAdapter.setOnItemClickListener(onClickListener);
 
         rvItems.setAdapter(itemAdapter);
-        Log.d(TAG, "onCreate: ");
-        
-        
+    }
 
+    private void PopulateItems() {
+        try {
+            boolean xmlFileEmpty = ReadXMLFile();
+            if (xmlFileEmpty) {
+                Log.d(TAG, "PopulateItems: XML is Empty. Creating default items:");
+                createItems();
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error populating items: " + e.getMessage());
+        }
     }
 
     // Creates a list default list of objects to display
@@ -105,10 +130,12 @@ public class MainActivity extends AppCompatActivity {
         items.add(new Item("Flour", 0, 0));
         items.add(new Item("Chocolate", 1, 0));
         items.add(new Item("Cookies", 0, 1));
-
+        Log.d(TAG, "createItems: Items created: " + items.size());
+        // Save new items in XMLFile
+        WriteXMLFile();
     }
 
-    // Menu Methods
+    // Menu Methods -----------------------------------------------------------------------------------------------
     @Override
     public boolean onCreateOptionsMenu(Menu menu) // Generate Menu Items
     {
@@ -124,32 +151,78 @@ public class MainActivity extends AppCompatActivity {
         if(id == R.id.action_showMasterList)
         {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
-            ReadTextFile();
+            ShowMasterList();
         }
         else if (id == R.id.action_showShoppingList)
         {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
-            WriteTextFile();
+            ShowShoppingList();
         } else if (id == R.id.action_addItem)
         {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
-            ReadXMLFile();
+            addItemDialog();
 
         } else if (id == R.id.action_clearAll)
         {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
-            WriteXMLFile();
+            ClearAll();
 
         } else { // Delete Checked
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
-            //WriteXMLFile();
+            DeleteChecked();
         }
         return super.onOptionsItemSelected(item);
     }
 
 
-    // Document Manipulation - Read and Write TXT and XML files
-    private void WriteXMLFile() {
+    private void DeleteChecked() {
+    }
+
+    private void ClearAll() {
+    }
+
+    private void ShowShoppingList() {
+        try {
+
+            Log.d(TAG, "ShowShoppingList: ******* Creating new list ******* ");
+            for (Item item : items) {
+
+                Log.d(TAG, "ShowShoppingList: Item: " + item.getDescription() + item.getIsOnShoppingList() + item.getIsInCart());
+
+                if (item.getIsOnShoppingList() == 1) {
+                    Log.d(TAG, "ShowShoppingList: Error?");
+                    shoppingListItems.add(new Item(item.getDescription(), item.getIsOnShoppingList(), item.getIsInCart()));
+                    Log.d(TAG, "ShowShoppingList: Added");
+                }else {
+                    Log.d(TAG, "ShowShoppingList: Not added");
+                }
+            }
+            Log.d(TAG, "ShowShoppingList: Items added to ShoppingList: " + shoppingListItems.size());
+            itemAdapter = new ItemAdapter(shoppingListItems, this);
+
+            Log.d(TAG, "ShowShoppingList: View Changed to Shopping List");
+
+
+        } catch (Exception e) {
+            Log.e(TAG, "ShowShoppingList: "+ e.getMessage());
+        }
+
+
+
+    }
+
+    private void ShowMasterList() {
+        itemAdapter = new ItemAdapter(items, this);
+    }
+
+
+
+
+
+
+
+    // Document Manipulation - Read and Write TXT and XML files --------------------------------------------------------------
+    public void WriteXMLFile() {
         try{
             Log.d(TAG, "WriteXMLFile: Start");
             FileIO fileIO = new FileIO();
@@ -162,19 +235,63 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void ReadXMLFile() {
+    public boolean ReadXMLFile() {
         try {
             FileIO fileIO = new FileIO();
             items = fileIO.ReadFromXMLFile(XMLFILENAME, this);
-            Log.d(TAG, "ReadXMLFile: Items: " + items.size());
-        }
-        catch (Exception e)
-        {
+            Log.d(TAG, "ReadXMLFile: Items loaded: " + items.size());
+
+            if (items.isEmpty()) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (Exception e) {
             Log.d(TAG, "ReadXMLFile: " + e.getMessage());
+            return  false;
         }
+    }
+
+
+
+    private void addItemDialog() {
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        final View addItemView = layoutInflater.inflate(R.layout.additem, null);
+
+        // Show the Dialog to the user modularly.
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.add_item)
+                .setView(addItemView)
+                .setPositiveButton(getString(R.string.ok),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d(TAG, "onClick: OK");
+                                EditText etItem = addItemView.findViewById(R.id.etAddItem);
+                                String itemDecription = etItem.getText().toString();
+
+                                // Add new item created to list
+                                items.add(new Item(itemDecription, 1,0));
+
+                                Log.d(TAG, "onClick: New item added: " + itemDecription);
+                                // Save items in xml file
+                                WriteXMLFile();
+                            }
+                        })
+                .setNegativeButton(getString(R.string.cancel),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d(TAG, "onClick: Cancel");
+                            }
+                        }).show();
 
     }
 
+
+
+    // Not using TXT file manipulation
     private void WriteTextFile() {
         try{
             FileIO fileIO = new FileIO();

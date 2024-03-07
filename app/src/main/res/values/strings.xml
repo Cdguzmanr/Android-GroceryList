@@ -6,4 +6,7 @@
     <string name="clear_all">Clear All</string>
     <string name="delete_checked">Delete Checked</string>
     <string name="item">Item</string>
+    <string name="type_in_an_item">Type in an item:</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
 </resources>
