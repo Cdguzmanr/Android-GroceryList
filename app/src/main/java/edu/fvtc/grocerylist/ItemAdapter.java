@@ -49,10 +49,25 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         }
     }
 
+
+
+    // Item Adapter Class -----------------------------------------------
+
+    private boolean isMaster; // Flag to determine current view type
+
+    // Two variable constructor
     public ItemAdapter(ArrayList<Item> data, Context context) {
         itemData = data;
         parentContext = context;
     }
+
+    // Three variable constructor
+    public ItemAdapter(ArrayList<Item> data, Context context, boolean isMaster) {
+        itemData = data;
+        parentContext = context;
+        this.isMaster = isMaster;
+    }
+
 
     public void setOnItemClickListener(View.OnClickListener itemClickListener){
         onItemClickListener = itemClickListener;
@@ -65,13 +80,40 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         return new ItemViewHolder(v);
     }
 
-    @Override
+
+    // Old binder
+/*    @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         Item item = itemData.get(position);
         holder.getChkItem().setText(item.getDescription());
         // Set the checkbox state based on the item's isInCart value
         holder.getChkItem().setChecked(item.getIsInCart() == 1);
+    }*/
+
+    // New binder
+    @Override
+    public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
+        Item item = itemData.get(position);
+        holder.getChkItem().setText(item.getDescription());
+
+        // Determine checkbox state based on the item's isInCart value
+        holder.getChkItem().setChecked(item.getIsInCart() == 1);
+
+        // Handle checkbox click event to update isInCart property and save changes
+        holder.getChkItem().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    Item clickedItem = itemData.get(adapterPosition);
+                    clickedItem.setIsInCart(holder.getChkItem().isChecked() ? 1 : 0);
+                    ((MainActivity) parentContext).WriteXMLFile(); // Save changes to file
+                }
+            }
+        });
     }
+
+
 
     @Override
     public int getItemCount() {

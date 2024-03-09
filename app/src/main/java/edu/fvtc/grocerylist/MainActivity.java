@@ -26,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
     public ItemAdapter itemAdapter;
 
     ArrayList<Item> items;
-    ArrayList<Item> shoppingListItems;
+    ArrayList<Item> shoppingItems = new ArrayList<>();
+
+    boolean isMaster; // flag to identify the current view
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -50,33 +52,45 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: ---------------------------- New Run --------------------------------------");
 
-
-        // Added Methods:
-        //createItems(); // Call method to generate items
-
+        // Initialize isMaster flag to true
+        isMaster = true;
+        this.setTitle("Master List");
         // Populate items
         PopulateItems();
 
-
-
-
-        // Adds current items in the class to an array
-        ArrayList<String> descriptions = new ArrayList<String>();
+        // Adds current items in the class to an array // Do I need this?
+/*        ArrayList<String> descriptions = new ArrayList<String>();
         for(Item item : items)
         {
             descriptions.add(item.toString());
-        }
+        }*/
 
-        // Bind the Recyclerview || Allows the display of items in the array into the RecyclerView at activity_main
+        bindRecyclerView(items);
+
+/*        // Bind the Recyclerview || Allows the display of items in the array into the RecyclerView at activity_main
         RecyclerView rvItems = findViewById(R.id.rvItems);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         rvItems.setLayoutManager(layoutManager);
         itemAdapter = new ItemAdapter(items, this);
         itemAdapter.setOnItemClickListener(onClickListener);
+        rvItems.setAdapter(itemAdapter);*/
 
+
+    }
+
+
+    private void bindRecyclerView(ArrayList<Item> data) {
+        // Bind the RecyclerView
+        RecyclerView rvItems = findViewById(R.id.rvItems);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        rvItems.setLayoutManager(layoutManager);
+        itemAdapter = new ItemAdapter(data, this, isMaster); // Pass isMaster flag to the adapter
+        itemAdapter.setOnItemClickListener(onClickListener);
         rvItems.setAdapter(itemAdapter);
     }
 
+
+    // Verifies if XML can be readed
     private void PopulateItems() {
         try {
             boolean xmlFileEmpty = ReadXMLFile();
@@ -84,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "PopulateItems: XML is Empty. Creating default items:");
                 createItems();
             }
-
+            updateShoppingItems();
         } catch (Exception e) {
             Log.e(TAG, "Error populating items: " + e.getMessage());
         }
@@ -100,7 +114,8 @@ public class MainActivity extends AppCompatActivity {
         items.add(new Item("Bacon", 1,1));
         items.add(new Item("Bread", 0,0));
         items.add(new Item("Coffee", 0,1));
-        items.add(new Item("Apples", 1, 0));
+
+/*        items.add(new Item("Apples", 1, 0));
         items.add(new Item("Oranges", 1, 1));
         items.add(new Item("Bananas", 1, 1));
         items.add(new Item("Cereal", 0, 0));
@@ -129,10 +144,23 @@ public class MainActivity extends AppCompatActivity {
         items.add(new Item("Sugar", 1, 1));
         items.add(new Item("Flour", 0, 0));
         items.add(new Item("Chocolate", 1, 0));
-        items.add(new Item("Cookies", 0, 1));
+        items.add(new Item("Cookies", 0, 1));*/
+
         Log.d(TAG, "createItems: Items created: " + items.size());
         // Save new items in XMLFile
         WriteXMLFile();
+    }
+
+    private void updateShoppingItems() {
+        shoppingItems.clear(); // Clear existing shopping items
+
+        // Iterate through items and add those where isOnShoppingList = 1 to shoppingItems
+        for (Item item : items) {
+            if (item.getIsOnShoppingList() == 1) {
+                shoppingItems.add(item);
+            }
+        }
+        Log.d(TAG, "updateShoppingItems: Shopping List Items updated. Added: " + shoppingItems.size());
     }
 
     // Menu Methods -----------------------------------------------------------------------------------------------
@@ -176,49 +204,56 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void DeleteChecked() {
+
+        ArrayList<Item> deletedItems = new ArrayList<>();
+        // Find checked items
+        int counter = 0;
+        if (isMaster){
+            for (Item item : items) {
+                if (item.getIsInCart() == 1) {
+                    deletedItems.add(item);
+                    counter ++;
+                }
+            }
+            Log.d(TAG, "DeleteChecked: Items deleted from Master List: " + counter);
+        } else {
+            for (Item item : items) {
+                if (item.getIsInCart() == 1) {
+                    item.setIsOnShoppingList(0);
+                    item.setIsInCart(0);
+                    counter ++;
+                }
+            }
+            Log.d(TAG, "DeleteChecked: Items deleted from Shopping List: " + counter);
+        }
+
+        // Notify adapter of data change and save changes
+        items.removeAll(deletedItems);
+        itemAdapter.notifyDataSetChanged();
+        WriteXMLFile();
     }
 
     private void ClearAll() {
+        // Iterate through items and clear isChecked state
+        for (Item item : items) {
+            item.setIsInCart(0); // Clear checkbox state
+        }
+        itemAdapter.notifyDataSetChanged(); // Notify adapter of data change
+        WriteXMLFile(); // Save changes to file
     }
 
     private void ShowShoppingList() {
-        try {
-
-            Log.d(TAG, "ShowShoppingList: ******* Creating new list ******* ");
-            for (Item item : items) {
-
-                Log.d(TAG, "ShowShoppingList: Item: " + item.getDescription() + item.getIsOnShoppingList() + item.getIsInCart());
-
-                if (item.getIsOnShoppingList() == 1) {
-                    Log.d(TAG, "ShowShoppingList: Error?");
-                    shoppingListItems.add(new Item(item.getDescription(), item.getIsOnShoppingList(), item.getIsInCart()));
-                    Log.d(TAG, "ShowShoppingList: Added");
-                }else {
-                    Log.d(TAG, "ShowShoppingList: Not added");
-                }
-            }
-            Log.d(TAG, "ShowShoppingList: Items added to ShoppingList: " + shoppingListItems.size());
-            itemAdapter = new ItemAdapter(shoppingListItems, this);
-
-            Log.d(TAG, "ShowShoppingList: View Changed to Shopping List");
-
-
-        } catch (Exception e) {
-            Log.e(TAG, "ShowShoppingList: "+ e.getMessage());
-        }
-
-
-
+        isMaster = false;
+        updateShoppingItems();
+        bindRecyclerView(shoppingItems); // Refresh RecyclerView with Shopping List data
+        this.setTitle("Shopping List");
     }
 
     private void ShowMasterList() {
-        itemAdapter = new ItemAdapter(items, this);
+        isMaster = true;
+        bindRecyclerView(items); // Refresh RecyclerView with Master List data
+        this.setTitle("Master List");
     }
-
-
-
-
-
 
 
     // Document Manipulation - Read and Write TXT and XML files --------------------------------------------------------------
@@ -228,6 +263,8 @@ public class MainActivity extends AppCompatActivity {
             FileIO fileIO = new FileIO();
             fileIO.WriteXMLFile(XMLFILENAME, this, items);
             Log.d(TAG, "WriteXMLFile: End");
+
+            updateShoppingItems(); // Updates the ShoppingList array
         }
         catch(Exception e)
         {
@@ -272,7 +309,13 @@ public class MainActivity extends AppCompatActivity {
                                 String itemDecription = etItem.getText().toString();
 
                                 // Add new item created to list
-                                items.add(new Item(itemDecription, 1,0));
+                                if (isMaster){
+                                    items.add(new Item(itemDecription, 0,0));
+                                } else {
+                                    items.add(new Item(itemDecription, 1,0));
+                                }
+
+
 
                                 Log.d(TAG, "onClick: New item added: " + itemDecription);
                                 // Save items in xml file
