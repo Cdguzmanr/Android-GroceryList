@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         items = new ArrayList<Item>();
 
         // Description, isOnShoppingList, isInCart
+        items.add(new Item("Local Data", 1,1));
         items.add(new Item("Milk", 1,0));
         items.add(new Item("Eggs", 1,1));
         items.add(new Item("Bacon", 1,1));
