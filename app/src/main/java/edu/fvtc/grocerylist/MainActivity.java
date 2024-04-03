@@ -55,7 +55,12 @@ public class MainActivity extends AppCompatActivity {
         // Initialize isMaster flag to true
         isMaster = true;
         this.setTitle("Master List");
-        // Populate items
+
+        // Init Database and load DB files
+        initDatabase();
+
+
+        // Populate items from local XML Files
         PopulateItems();
 
         // Adds current items in the class to an array // Do I need this?
@@ -76,6 +81,13 @@ public class MainActivity extends AppCompatActivity {
         rvItems.setAdapter(itemAdapter);*/
 
 
+    }
+
+    private void initDatabase() {
+        DataSource ds = new DataSource(this);
+        ds.open(true);
+        items = ds.get();
+        Log.d(TAG, "initDatabase: Teams: " + items.size());
     }
 
 
