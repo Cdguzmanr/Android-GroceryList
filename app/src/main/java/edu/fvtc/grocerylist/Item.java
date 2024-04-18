@@ -1,52 +1,59 @@
 package edu.fvtc.grocerylist;
 
 public class Item {
-    private int Id;
-    private String Description;
-    private int IsOnShoppingList;
-    private int IsInCart;
+    private int id;
+    private String description;
+    private int isOnShoppingList;
+    private int isInCart;
+    private int imgId;
 
     public Item() {
-        this.Description = "";
-        this.IsOnShoppingList = 0;
-        this.IsInCart = 0;
+        this.description = "";
+        this.isOnShoppingList = 0;
+        this.isInCart = 0;
     }
 
     public Item(String description, int isOnShoppingList, int isInCart) {
-        this.Description = description;
-        this.IsOnShoppingList = isOnShoppingList;
-        this.IsInCart = isInCart;
+        this.description = description;
+        this.isOnShoppingList = isOnShoppingList;
+        this.isInCart = isInCart;
     }
 
     // Getters and setters
     public int getId() {
-        return Id;
+        return id;
     }
-
     public void setId(int id) {
-        Id = id;
-    }
-    public String getDescription() {
-        return Description;
+        this.id = id;
     }
 
+    public String getDescription() {
+        return description;
+    }
     public void setDescription(String description) {
-        this.Description = description;
+        this.description = description;
     }
 
     public int getIsOnShoppingList() {
-        return IsOnShoppingList;
+        return isOnShoppingList;
     }
-
-    public void setIsOnShoppingList(int isOnShoppingList) {
-        this.IsOnShoppingList = isOnShoppingList;
-    }
+    public void setIsOnShoppingList(int isOnShoppingList) { this.isOnShoppingList = isOnShoppingList; }
 
     public int getIsInCart() {
-        return IsInCart;
+        return isInCart;
     }
 
     public void setIsInCart(int isInCart) {
-        this.IsInCart = isInCart;
+        this.isInCart = isInCart;
     }
+
+    public int getImgId() {
+        return imgId;
+    }
+
+    public void setImgId(int imgId) {
+        this.imgId = imgId;
+    }
+
+
 }

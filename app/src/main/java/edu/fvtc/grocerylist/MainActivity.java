@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -57,11 +58,16 @@ public class MainActivity extends AppCompatActivity {
         this.setTitle("Master List");
 
         // Init Database and load DB files
-        initDatabase();
+        //initDatabase();
+
+
+
+
+
 
 
         // Populate items from local XML Files
-        PopulateItems();
+        //PopulateItems();
 
         // Adds current items in the class to an array // Do I need this?
 /*        ArrayList<String> descriptions = new ArrayList<String>();
@@ -83,12 +89,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void initDatabase() {
-        DataSource ds = new DataSource(this);
-        ds.open(true);
-        items = ds.get();
-        Log.d(TAG, "initDatabase: Teams: " + items.size());
-    }
+//    private void initDatabase() {
+//        DataSource ds = new DataSource(this);
+//        ds.open(true);
+//        items = ds.get();
+//        Log.d(TAG, "initDatabase: Teams: " + items.size());
+//    }
+
+//    private void initDatabase() {
+//        DataSource ds = new DataSource(this);
+//        ds.open(false);
+//        String sortBy = getSharedPreferences("teamspreferences",
+//                Context.MODE_PRIVATE)
+//                .getString("sortby", "name");
+//        String sortOrder = getSharedPreferences("teamspreferences",
+//                Context.MODE_PRIVATE)
+//                .getString("sortorder", "ASC");
+//        items = ds.get(sortBy, sortOrder);
+//        Log.d(TAG, "initDatabase: Teams: " + items.size());
+//    }
+
+
 
 
     private void bindRecyclerView(ArrayList<Item> data) {
