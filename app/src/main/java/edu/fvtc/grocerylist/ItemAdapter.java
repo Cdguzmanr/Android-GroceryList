@@ -6,6 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,15 +19,26 @@ import java.util.ArrayList;
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
     private ArrayList<Item> itemData;
     private View.OnClickListener onItemClickListener;
+    private CompoundButton.OnCheckedChangeListener onItemCheckedChangeListener;
     public static final String TAG = "ItemAdapter";
     private Context parentContext;
+    private boolean isDeleting;
+    public void setDelete(boolean b)
+    {
+        isDeleting = b;
+    }
+
+
 
     public class ItemViewHolder extends RecyclerView.ViewHolder{
         public CheckBox chkItem;
+        public ImageButton imgItem;
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
             chkItem = itemView.findViewById(R.id.chkItem);
+            imgItem = itemView.findViewById(R.id.imgItem);
+
             itemView.setTag(this);
             itemView.setOnClickListener(onItemClickListener);
 
@@ -47,27 +61,21 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         public CheckBox getChkItem() {
             return chkItem;
         }
+        public ImageButton getImageButtonPhoto() {return imgItem;}
     }
 
 
 
     // Item Adapter Class -----------------------------------------------
-
     private boolean isMaster; // Flag to determine current view type
 
-    // Two variable constructor
-    public ItemAdapter(ArrayList<Item> data, Context context) {
-        itemData = data;
-        parentContext = context;
-    }
-
-    // Three variable constructor
     public ItemAdapter(ArrayList<Item> data, Context context, boolean isMaster) {
         itemData = data;
         parentContext = context;
         this.isMaster = isMaster;
-    }
 
+        Log.d(TAG, "ItemAdapter: " + data.size());
+    }
 
     public void setOnItemClickListener(View.OnClickListener itemClickListener){
         onItemClickListener = itemClickListener;
@@ -94,6 +102,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         Item item = itemData.get(position);
+
+        // Set image
+        if(itemData.get(position).getPhoto() != null)
+            holder.getImageButtonPhoto().setImageBitmap(itemData.get(position).getPhoto());
+
+
         holder.getChkItem().setText(item.getDescription());
 
         // Determine checkbox state based on the item's isInCart value

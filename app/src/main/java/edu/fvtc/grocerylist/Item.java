@@ -1,5 +1,7 @@
 package edu.fvtc.grocerylist;
 
+import android.graphics.Bitmap;
+
 public class Item {
     private int id;
     private String description;
@@ -11,12 +13,20 @@ public class Item {
         this.description = "";
         this.isOnShoppingList = 0;
         this.isInCart = 0;
+        this.imgId = 0;
     }
 
     public Item(String description, int isOnShoppingList, int isInCart) {
         this.description = description;
         this.isOnShoppingList = isOnShoppingList;
         this.isInCart = isInCart;
+    }
+
+    public Item(String description, int isOnShoppingList, int isInCart, int imgId) {
+        this.description = description;
+        this.isOnShoppingList = isOnShoppingList;
+        this.isInCart = isInCart;
+        this.imgId = imgId;
     }
 
     // Getters and setters
@@ -56,4 +66,38 @@ public class Item {
     }
 
 
+    // API
+    public Bitmap getPhoto() {
+        return photo;
+    }
+    public void setPhoto(Bitmap photo) {
+        this.photo = photo;
+    }
+
+    private Bitmap photo;
+
+/*    public void setControlText(int controlId, String value)
+    {
+        if(controlId == R.id.etName)
+        {
+            this.setName(value);
+        } else if (controlId == R.id.etCity) {
+            this.setCity(value);
+        }
+        else
+        {
+            this.setCellPhone(value);
+        }
+
+    }*/
+
+    @Override
+    public String toString()
+    {
+        return String.valueOf(id) + '|' +
+                description + '|' +
+                isOnShoppingList + '|' +
+                isInCart + '|' +
+                imgId;
+    }
 }

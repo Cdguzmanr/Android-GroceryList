@@ -9,4 +9,16 @@
     <string name="type_in_an_item">Type in an item:</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+
+    <string name="_100">100%</string>
+    <string name="newtext">New</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="sort_order">Sort Order</string>
+    <string name="sort_by">Sort By</string>
+
+    <string name="api_url">https://fvtcdp.azurewebsites.net/api/GroceryList/</string>
+    <string name="api_url_bfoote">https://fvtcdp.azurewebsites.net/api/GroceryList/bfoote</string>
+    <string name="item_image">Item Image</string>
 </resources>

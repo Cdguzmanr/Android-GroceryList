@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String XMLFILENAME = "data.xml";
     public ItemAdapter itemAdapter;
 
-    ArrayList<Item> items;
+    ArrayList<Item> items = new ArrayList<Item>();
     ArrayList<Item> shoppingItems = new ArrayList<>();
 
     boolean isMaster; // flag to identify the current view
@@ -56,18 +56,19 @@ public class MainActivity extends AppCompatActivity {
         // Initialize isMaster flag to true
         isMaster = true;
         this.setTitle("Master List");
+        //items = new ArrayList<Item>();
+
+
+        // Init API
+        readFromAPI();
 
         // Init Database and load DB files
         //initDatabase();
 
 
-
-
-
-
-
         // Populate items from local XML Files
-        //PopulateItems();
+        //PopulateItemsXML();
+
 
         // Adds current items in the class to an array // Do I need this?
 /*        ArrayList<String> descriptions = new ArrayList<String>();
@@ -76,37 +77,52 @@ public class MainActivity extends AppCompatActivity {
             descriptions.add(item.toString());
         }*/
 
+        // Bind the Recyclerview || Allows the display of items in the array into the RecyclerView at activity_main
         bindRecyclerView(items);
 
-/*        // Bind the Recyclerview || Allows the display of items in the array into the RecyclerView at activity_main
-        RecyclerView rvItems = findViewById(R.id.rvItems);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        rvItems.setLayoutManager(layoutManager);
-        itemAdapter = new ItemAdapter(items, this);
-        itemAdapter.setOnItemClickListener(onClickListener);
-        rvItems.setAdapter(itemAdapter);*/
+
 
 
     }
+
+    private void readFromAPI() {
+        try{
+            Log.d(TAG, "readFromAPI: Start");
+            RestClient.execGetRequest(getString(R.string.api_url_bfoote),
+                    this,
+                    new VolleyCallback() {
+                        @Override
+                        public void onSuccess(ArrayList<Item> result) {
+                            Log.d(TAG, "onSuccess: Got Here!");
+                            items = result;
+                            bindRecyclerView(items);
+                        }
+                    });
+        }
+        catch(Exception e){
+            Log.e(TAG, "readFromAPI: Error: " + e.getMessage());
+        }
+    }
+
 
 //    private void initDatabase() {
 //        DataSource ds = new DataSource(this);
 //        ds.open(true);
 //        items = ds.get();
-//        Log.d(TAG, "initDatabase: Teams: " + items.size());
+//        Log.d(TAG, "initDatabase: Items: " + items.size());
 //    }
 
 //    private void initDatabase() {
 //        DataSource ds = new DataSource(this);
 //        ds.open(false);
-//        String sortBy = getSharedPreferences("teamspreferences",
+//        String sortBy = getSharedPreferences("itemspreferences",
 //                Context.MODE_PRIVATE)
 //                .getString("sortby", "name");
-//        String sortOrder = getSharedPreferences("teamspreferences",
+//        String sortOrder = getSharedPreferences("itemspreferences",
 //                Context.MODE_PRIVATE)
 //                .getString("sortorder", "ASC");
 //        items = ds.get(sortBy, sortOrder);
-//        Log.d(TAG, "initDatabase: Teams: " + items.size());
+//        Log.d(TAG, "initDatabase: Items: " + items.size());
 //    }
 
 
@@ -124,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Verifies if XML can be readed
-    private void PopulateItems() {
+    private void PopulateItemsXML() {
         try {
             boolean xmlFileEmpty = ReadXMLFile();
             if (xmlFileEmpty) {
@@ -148,37 +164,6 @@ public class MainActivity extends AppCompatActivity {
         items.add(new Item("Bacon", 1,1));
         items.add(new Item("Bread", 0,0));
         items.add(new Item("Coffee", 0,1));
-
-/*        items.add(new Item("Apples", 1, 0));
-        items.add(new Item("Oranges", 1, 1));
-        items.add(new Item("Bananas", 1, 1));
-        items.add(new Item("Cereal", 0, 0));
-        items.add(new Item("Butter", 0, 1));
-        items.add(new Item("Cheese", 1, 0));
-        items.add(new Item("Yogurt", 1, 1));
-        items.add(new Item("Spinach", 1, 0));
-        items.add(new Item("Tomatoes", 0, 1));
-        items.add(new Item("Potatoes", 0, 1));
-        items.add(new Item("Onions", 1, 0));
-        items.add(new Item("Carrots", 1, 1));
-        items.add(new Item("Pasta", 0, 0));
-        items.add(new Item("Rice", 0, 1));
-        items.add(new Item("Chicken", 1, 0));
-        items.add(new Item("Beef", 1, 1));
-        items.add(new Item("Pork", 0, 1));
-        items.add(new Item("Salmon", 1, 0));
-        items.add(new Item("Shrimp", 0, 1));
-        items.add(new Item("Ice Cream", 1, 0));
-        items.add(new Item("Frozen Pizza", 1, 1));
-        items.add(new Item("Frozen Vegetables", 0, 1));
-        items.add(new Item("Olive Oil", 1, 0));
-        items.add(new Item("Vinegar", 0, 1));
-        items.add(new Item("Salt", 1, 0));
-        items.add(new Item("Pepper", 0, 1));
-        items.add(new Item("Sugar", 1, 1));
-        items.add(new Item("Flour", 0, 0));
-        items.add(new Item("Chocolate", 1, 0));
-        items.add(new Item("Cookies", 0, 1));*/
 
         Log.d(TAG, "createItems: Items created: " + items.size());
         // Save new items in XMLFile
@@ -290,41 +275,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // Document Manipulation - Read and Write TXT and XML files --------------------------------------------------------------
-    public void WriteXMLFile() {
-        try{
-            Log.d(TAG, "WriteXMLFile: Start");
-            FileIO fileIO = new FileIO();
-            fileIO.WriteXMLFile(XMLFILENAME, this, items);
-            Log.d(TAG, "WriteXMLFile: End");
-
-            updateShoppingItems(); // Updates the ShoppingList array
-        }
-        catch(Exception e)
-        {
-            Log.d(TAG, "WriteXMLFile: " + e.getMessage());
-        }
-    }
-
-    public boolean ReadXMLFile() {
-        try {
-            FileIO fileIO = new FileIO();
-            items = fileIO.ReadFromXMLFile(XMLFILENAME, this);
-            Log.d(TAG, "ReadXMLFile: Items loaded: " + items.size());
-
-            if (items.isEmpty()) {
-                return true;
-            } else {
-                return false;
-            }
-
-        } catch (Exception e) {
-            Log.d(TAG, "ReadXMLFile: " + e.getMessage());
-            return  false;
-        }
-    }
-
-
 
     private void addItemDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(this);
@@ -367,6 +317,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    // Document Manipulation - Read and Write TXT and XML files --------------------------------------------------------------
+    public void WriteXMLFile() {
+        try{
+            Log.d(TAG, "WriteXMLFile: Start");
+            FileIO fileIO = new FileIO();
+            fileIO.WriteXMLFile(XMLFILENAME, this, items);
+            Log.d(TAG, "WriteXMLFile: End");
+
+            updateShoppingItems(); // Updates the ShoppingList array
+        }
+        catch(Exception e)
+        {
+            Log.d(TAG, "WriteXMLFile: " + e.getMessage());
+        }
+    }
+    public boolean ReadXMLFile() {
+        try {
+            FileIO fileIO = new FileIO();
+            items = fileIO.ReadFromXMLFile(XMLFILENAME, this);
+            Log.d(TAG, "ReadXMLFile: Items loaded: " + items.size());
+
+            if (items.isEmpty()) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (Exception e) {
+            Log.d(TAG, "ReadXMLFile: " + e.getMessage());
+            return  false;
+        }
+    }
+
 
     // Not using TXT file manipulation
     private void WriteTextFile() {
@@ -387,8 +370,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "WriteTextFile: " + e.getMessage());
         }
     }
-
-
     private void ReadTextFile() {
         try {
             FileIO fileIO = new FileIO();

@@ -1,18 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <CheckBox
         android:id="@+id/chkItem"
-        android:layout_width="match_parent"
+        android:layout_width="260dp"
         android:layout_height="wrap_content"
+        android:buttonTint="@color/white"
+        android:text="@string/item"
+        android:textColor="@color/white"
+        android:textSize="20sp"
         android:layoutDirection="rtl"
         android:layout_marginStart="20dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <ImageButton
+        android:id="@+id/imgItem"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginEnd="10dp"
-        android:textSize="20sp"
-        android:textColor="@color/white"
-        android:buttonTint="@color/white"
-        android:text="@string/item" />
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:contentDescription="@string/item_image"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/photoicon" />
 </androidx.constraintlayout.widget.ConstraintLayout>
