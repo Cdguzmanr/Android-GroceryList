@@ -21,4 +21,9 @@
     <string name="api_url">https://fvtcdp.azurewebsites.net/api/GroceryList/</string>
     <string name="api_url_bfoote">https://fvtcdp.azurewebsites.net/api/GroceryList/bfoote</string>
     <string name="item_image">Item Image</string>
+    <string name="owner">Owner:</string>
+    <string name="off">Off</string>
+    <string name="save">Save</string>
+    <string name="name">Name</string>
+    <string name="enter_name">Enter Name</string>
 </resources>

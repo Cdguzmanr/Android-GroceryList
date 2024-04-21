@@ -9,12 +9,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -42,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "onClick: " + item.toString());
 
             // Add code to startActivity of another activity.
+            Log.d(TAG, "onClick: " + item.getDescription());
+            Intent intent = new Intent(MainActivity.this, ItemsEditActivity.class);
+            intent.putExtra("itemid", item.getId());
+            Log.d(TAG, "onClick: " + item.getId());
+            startActivity(intent);
         }
     };
 
@@ -83,6 +90,13 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void AddItem() {
+        Intent intent = new Intent(MainActivity.this, ItemsEditActivity.class);
+        intent.putExtra("itemid", -1);
+        Log.d(TAG, "onClick: ");
+        startActivity(intent);
     }
 
     private void readFromAPI() {
@@ -207,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.action_addItem)
         {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
-            addItemDialog();
+            AddItem();
 
         } else if (id == R.id.action_clearAll)
         {

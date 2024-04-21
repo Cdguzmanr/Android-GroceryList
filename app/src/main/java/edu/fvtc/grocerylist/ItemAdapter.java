@@ -128,6 +128,37 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
     }
 
 
+    private void deleteItem(int position) {
+        Log.d(TAG, "deleteItem: " + position);
+        Item item = itemData.get(position);
+        itemData.remove(position);
+
+        //FileIO.writeFile(ItemsListActivity.FILENAME,
+        //                (AppCompatActivity) parentContext.getApplicationContext(),
+        //                ItemsListActivity.createDataArray(itemData));
+        //                ItemsListActivity.createDataArray(itemData));
+        //                notifyDataSetChanged();
+
+        Log.d(TAG, "deleteItem: parentContext: " + parentContext);
+        RestClient.execDeleteRequest(item,
+                parentContext.getString(R.string.api_url_bfoote) + item.getId(),
+                parentContext,
+                new VolleyCallback() {
+                    @Override
+                    public void onSuccess(ArrayList<Item> result) {
+                        itemData.remove(item);
+                        notifyDataSetChanged();
+                        Log.d(TAG, "deleteItem");
+                    }
+                });
+
+        //ItemsDataSource ds = new ItemsDataSource(parentContext);
+        //Log.d(TAG, "deleteItem: " + item.toString());
+        //boolean didDelete = ds.delete(item) > 0;
+
+
+
+    }
 
     @Override
     public int getItemCount() {

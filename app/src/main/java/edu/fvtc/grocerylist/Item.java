@@ -10,7 +10,7 @@ public class Item {
     private int imgId;
 
     public Item() {
-        this.description = "";
+        this.description = "New Item";
         this.isOnShoppingList = 0;
         this.isInCart = 0;
         this.imgId = 0;
@@ -76,20 +76,14 @@ public class Item {
 
     private Bitmap photo;
 
-/*    public void setControlText(int controlId, String value)
+    public void setControlText(int controlId, String value)
     {
         if(controlId == R.id.etName)
         {
-            this.setName(value);
-        } else if (controlId == R.id.etCity) {
-            this.setCity(value);
-        }
-        else
-        {
-            this.setCellPhone(value);
+            this.setDescription(value);
         }
 
-    }*/
+    }
 
     @Override
     public String toString()

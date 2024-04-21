@@ -161,6 +161,7 @@ public class RestClient {
 
             JsonObjectRequest request = new JsonObjectRequest(method, url, object,
                     new Response.Listener<JSONObject>() {
+
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.d(TAG, "onResponse: " + response);
