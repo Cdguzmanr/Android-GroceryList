@@ -15,6 +15,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -23,6 +24,8 @@ import java.util.ArrayList;
 
 public class RestClient {
     public static final String TAG = "RestClient";
+
+
     public static void execGetRequest(String url,
                                       Context context,
                                       VolleyCallback volleyCallback)
@@ -106,6 +109,7 @@ public class RestClient {
                                       VolleyCallback volleyCallback)
     {
         try {
+            Log.d(TAG, "execPutRequest: Item: " +item + " | url: " + url + " | Context: " + context + " | Volley: " +volleyCallback );
             executeRequest(item, url, context, volleyCallback, Request.Method.PUT);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -164,7 +168,18 @@ public class RestClient {
 
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.d(TAG, "onResponse: " + response);
+                            ArrayList<Item> items = new ArrayList<Item>();
+                            if(method == Request.Method.POST)
+                            {
+                                try {
+                                    item.setId(response.getInt("id"));
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                            items.add(item);
+                            Log.d(TAG, "onResponse: " + items);
+                            volleyCallback.onSuccess(items);
                         }
                     }, new Response.ErrorListener() {
                 @Override

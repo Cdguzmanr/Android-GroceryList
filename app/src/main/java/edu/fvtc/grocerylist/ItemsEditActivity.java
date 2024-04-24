@@ -30,7 +30,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 
 public class ItemsEditActivity extends AppCompatActivity {
-    public static final String TAG = ItemsEditActivity.class.toString();
+    public static final String TAG = "ItemsEdit";
     public static final int PERMISSION_REQUEST_PHONE = 102;
     public static final int PERMISSION_REQUEST_CAMERA = 103;
     public static final int CAMERA_REQUEST = 1888;
@@ -172,6 +172,11 @@ public class ItemsEditActivity extends AppCompatActivity {
                                 public void onSuccess(ArrayList<Item> result) {
                                     item.setId(result.get(0).getId());
                                     Log.d(TAG, "onSuccess: Post" + item.getId());
+
+                                    // Redirect to Main List View
+                                    Intent intent = new Intent(ItemsEditActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
                                 }
                             });
                 } else {

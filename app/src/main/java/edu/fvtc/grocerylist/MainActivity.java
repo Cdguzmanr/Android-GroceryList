@@ -10,6 +10,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,8 +29,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String XMLFILENAME = "data.xml";
     public ItemAdapter itemAdapter;
 
-    ArrayList<Item> items = new ArrayList<Item>();
+    static ArrayList<Item> items = new ArrayList<Item>();
     ArrayList<Item> shoppingItems = new ArrayList<>();
+    static String ownerUrl;
+    SharedPreferences sharedPreferences;
 
     boolean isMaster; // flag to identify the current view
 
@@ -65,31 +68,46 @@ public class MainActivity extends AppCompatActivity {
         this.setTitle("Master List");
         //items = new ArrayList<Item>();
 
+        checkOwner(); // Checks if theres owner in session. If not, redirect to SetOwner view.
 
-        // Init API
-        readFromAPI();
+        //readFromAPI(); // Init API
 
-        // Init Database and load DB files
-        //initDatabase();
+        //initDatabase(); // Init Database and load DB files
 
-
-        // Populate items from local XML Files
-        //PopulateItemsXML();
-
-
-        // Adds current items in the class to an array // Do I need this?
-/*        ArrayList<String> descriptions = new ArrayList<String>();
-        for(Item item : items)
-        {
-            descriptions.add(item.toString());
-        }*/
+        //PopulateItemsXML(); // Populate items from local XML Files
 
         // Bind the Recyclerview || Allows the display of items in the array into the RecyclerView at activity_main
         bindRecyclerView(items);
 
+    }
 
+    private void clearOwner() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("owner", null); // set the owner in local sessions (preferences)
+        editor.apply();
 
+        checkOwner();
+    }
 
+    private void checkOwner() {
+        sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String owner = sharedPreferences.getString("owner", null);
+
+        Log.d(TAG, "checkOwner: Current Owner: " + owner);
+        if (owner == null || owner.isEmpty()){
+            Log.d(TAG, "checkOwner: There's no owner, moving to SetOwner");
+            // Redirect to setOwner
+            Intent intent = new Intent(MainActivity.this,  SetOwner.class);
+            Log.d(TAG, "onClick: ");
+            startActivity(intent);
+            finish();
+        } else {
+            Log.d(TAG, "checkOwner: There is owner. Fetching data");
+
+            readFromAPI(owner);
+
+        }
     }
 
     private void AddItem() {
@@ -99,10 +117,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void readFromAPI() {
+    private void readFromAPI(String owner) {
         try{
             Log.d(TAG, "readFromAPI: Start");
-            RestClient.execGetRequest(getString(R.string.api_url_bfoote),
+
+            ownerUrl = "https://fvtcdp.azurewebsites.net/api/GroceryList/" + owner;
+
+            Log.d(TAG, "readFromAPI: Current URL: " + ownerUrl);
+            RestClient.execGetRequest(ownerUrl,
                     this,
                     new VolleyCallback() {
                         @Override
@@ -110,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(TAG, "onSuccess: Got Here!");
                             items = result;
                             bindRecyclerView(items);
+
+                            updateShoppingItems(); // Loads new Shopping list items from master
                         }
                     });
         }
@@ -117,6 +141,33 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "readFromAPI: Error: " + e.getMessage());
         }
     }
+
+    public void UpdateData() {
+
+        Log.d(TAG, "updateData: Updating items: ");
+        try {
+            for (Item item : items) {
+                Log.d(TAG, "updateData: " + item.toString());
+
+                RestClient.execPutRequest(item, ownerUrl, this, new VolleyCallback() {
+                    @Override
+                    public void onSuccess(ArrayList<Item> result) {
+
+
+
+                    }
+                });
+
+            }
+
+        Log.d(TAG, "updateData: Finished item update ----------");
+
+        }catch (Exception e){
+            Log.d(TAG, "fetchItemData: Error" + e.getMessage());
+        }
+    }
+
+
 
 
 //    private void initDatabase() {
@@ -181,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "createItems: Items created: " + items.size());
         // Save new items in XMLFile
-        WriteXMLFile();
+        //WriteXMLFile();
     }
 
     private void updateShoppingItems() {
@@ -228,6 +279,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
             ClearAll();
 
+        } else if (id == R.id.action_logout) {
+            clearOwner();
         } else { // Delete Checked
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
             DeleteChecked();
@@ -263,7 +316,9 @@ public class MainActivity extends AppCompatActivity {
         // Notify adapter of data change and save changes
         items.removeAll(deletedItems);
         itemAdapter.notifyDataSetChanged();
-        WriteXMLFile();
+
+        UpdateData();
+        //WriteXMLFile();
     }
 
     private void ClearAll() {
@@ -272,7 +327,9 @@ public class MainActivity extends AppCompatActivity {
             item.setIsInCart(0); // Clear checkbox state
         }
         itemAdapter.notifyDataSetChanged(); // Notify adapter of data change
-        WriteXMLFile(); // Save changes to file
+
+        UpdateData();
+        //WriteXMLFile(); // Save changes to file
     }
 
     private void ShowShoppingList() {
@@ -317,7 +374,9 @@ public class MainActivity extends AppCompatActivity {
 
                                 Log.d(TAG, "onClick: New item added: " + itemDecription);
                                 // Save items in xml file
-                                WriteXMLFile();
+
+                                UpdateData();
+//                                WriteXMLFile();
                             }
                         })
                 .setNegativeButton(getString(R.string.cancel),

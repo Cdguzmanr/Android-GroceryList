@@ -51,8 +51,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
                         // Update the isChecked state of the item
                         Item item = itemData.get(position);
                         item.setIsInCart(chkItem.isChecked() ? 1 : 0);
+
                         // Notify the activity to save changes
-                        ((MainActivity) parentContext).WriteXMLFile();
+                        ((MainActivity) parentContext).UpdateData();
+
                     }
                 }
             });
@@ -121,7 +123,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     Item clickedItem = itemData.get(adapterPosition);
                     clickedItem.setIsInCart(holder.getChkItem().isChecked() ? 1 : 0);
-                    ((MainActivity) parentContext).WriteXMLFile(); // Save changes to file
+                    ((MainActivity) parentContext).UpdateData(); // Save changes to file
                 }
             }
         });
