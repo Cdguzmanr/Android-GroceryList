@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("itemid", item.getId());
             Log.d(TAG, "onClick: " + item.getId());
             startActivity(intent);
+            MainActivity.this.finish();
         }
     };
 
@@ -115,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("itemid", -1);
         Log.d(TAG, "onClick: ");
         startActivity(intent);
+        this.finish();
     }
 
     private void readFromAPI(String owner) {
@@ -152,9 +154,6 @@ public class MainActivity extends AppCompatActivity {
                 RestClient.execPutRequest(item, ownerUrl, this, new VolleyCallback() {
                     @Override
                     public void onSuccess(ArrayList<Item> result) {
-
-
-
                     }
                 });
 

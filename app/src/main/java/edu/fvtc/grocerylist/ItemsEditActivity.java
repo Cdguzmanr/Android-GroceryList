@@ -8,7 +8,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -157,31 +159,27 @@ public class ItemsEditActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //ItemsDataSource ds = new ItemsDataSource(ItemsEditActivity.this);
-                //ds.open();
-                if (itemId == -1) {
+                if (itemId == -1)
+                {
                     Log.d(TAG, "onClick: Create New Item: " + item.toString());
-                    //item.setId(ds.getNewId());
-                    //items.add(item);
-                    //ds.insert(item);
 
-                    RestClient.execPostRequest(item, getString(R.string.api_url_bfoote),
+                    RestClient.execPostRequest(item, getString(R.string.api_url),
                             ItemsEditActivity.this,
                             new VolleyCallback() {
                                 @Override // work correctly please sobs***  T~T
                                 public void onSuccess(ArrayList<Item> result) {
                                     item.setId(result.get(0).getId());
-                                    Log.d(TAG, "onSuccess: Post" + item.getId());
+                                    Log.d(TAG, "onSuccess: ** Post: " + item.getId());
 
                                     // Redirect to Main List View
                                     Intent intent = new Intent(ItemsEditActivity.this, MainActivity.class);
                                     startActivity(intent);
                                     finish();
                                 }
-                            });
-                } else {
-                    //items.set(itemId, item);
-                    //ds.update(item);
+                            }
+                    );
+                }
+                else {
                     RestClient.execPutRequest(item, getString(R.string.api_url) + itemId,
                             ItemsEditActivity.this,
                             new VolleyCallback() {
@@ -191,9 +189,6 @@ public class ItemsEditActivity extends AppCompatActivity {
                                 }
                             });
                 }
-                //FileIO.writeFile(ItemsListActivity.FILENAME,
-                //          ItemsEditActivity.this,
-                //                 ItemsListActivity.createDataArray(items));
             }
         });
     }

@@ -24,8 +24,6 @@ import java.util.ArrayList;
 
 public class RestClient {
     public static final String TAG = "RestClient";
-
-
     public static void execGetRequest(String url,
                                       Context context,
                                       VolleyCallback volleyCallback)
@@ -44,19 +42,18 @@ public class RestClient {
                             Log.d(TAG, "onResponse: " + response);
 
                             try {
-                                JSONArray JsonItems = new JSONArray(response);
-                                for(int i = 0; i < JsonItems.length(); i++)
+                                JSONArray JSONitems = new JSONArray(response);
+                                for(int i = 0; i < JSONitems.length(); i++)
                                 {
-                                    JSONObject object = JsonItems.getJSONObject(i);
+                                    JSONObject object = JSONitems.getJSONObject(i);
                                     Item item = new Item();
                                     item.setId(object.getInt("id"));
                                     item.setDescription(object.getString("item"));
                                     item.setIsOnShoppingList(object.getInt("isOnShoppingList"));
                                     item.setIsInCart(object.getInt("isInCart"));
-
-                                    //item.setLatitude(object.getDouble("latitude"));
-                                    //item.setLongitude(object.getDouble("longitude"));
-
+                                    item.setOwner(object.getString("owner"));
+                                    item.setLatitude(object.getDouble("latitude"));
+                                    item.setLongitude(object.getDouble("longitude"));
                                     String jsonPhoto = object.getString("photo");
 
                                     if(jsonPhoto != null)
@@ -109,7 +106,6 @@ public class RestClient {
                                       VolleyCallback volleyCallback)
     {
         try {
-            Log.d(TAG, "execPutRequest: Item: " +item + " | url: " + url + " | Context: " + context + " | Volley: " +volleyCallback );
             executeRequest(item, url, context, volleyCallback, Request.Method.PUT);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -138,12 +134,14 @@ public class RestClient {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(context);
             JSONObject object = new JSONObject();
-
             object.put("id", item.getId());
             object.put("item", item.getDescription());
             object.put("isOnShoppingList", item.getIsOnShoppingList());
             object.put("isInCart", item.getIsInCart());
 
+            object.put("owner", item.getOwner());
+            object.put("latitude", item.getLatitude());
+            object.put("longitude", item.getLongitude());
 
             if(item.getPhoto() != null)
             {
@@ -158,14 +156,11 @@ public class RestClient {
             {
                 object.put("photo", null);
             }
-
-
             final String requestBody = object.toString();
             Log.d(TAG, "executeRequest: " + requestBody);
 
             JsonObjectRequest request = new JsonObjectRequest(method, url, object,
                     new Response.Listener<JSONObject>() {
-
                         @Override
                         public void onResponse(JSONObject response) {
                             ArrayList<Item> items = new ArrayList<Item>();
@@ -220,8 +215,6 @@ public class RestClient {
                         public void onResponse(String response) {
                             Log.d(TAG, "onResponse: " + response);
 
-
-
                             try {
                                 JSONObject object = new JSONObject(response);
                                 Item item = new Item();
@@ -230,8 +223,10 @@ public class RestClient {
                                 item.setIsOnShoppingList(object.getInt("isOnShoppingList"));
                                 item.setIsInCart(object.getInt("isInCart"));
 
-                                //item.setLatitude(object.getDouble("latitude"));
-                                //item.setLongitude(object.getDouble("longitude"));
+
+                                item.setOwner(object.getString("owner"));
+                                item.setLatitude(object.getDouble("latitude"));
+                                item.setLongitude(object.getDouble("longitude"));
 
                                 String jsonPhoto = object.getString("photo");
 

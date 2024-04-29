@@ -7,22 +7,34 @@ public class Item {
     private String description;
     private int isOnShoppingList;
     private int isInCart;
+    private String owner;
+    private double latitude;
+    private double longitude;
+
     private int imgId;
+    private Bitmap photo;
 
     public Item() {
+        this.id = -1;
         this.description = "New Item";
         this.isOnShoppingList = 0;
         this.isInCart = 0;
         this.imgId = 0;
+        this.owner = "";
+        this.latitude = 0;
+        this.longitude = 0;
     }
 
     public Item(String description, int isOnShoppingList, int isInCart) {
+        this.id = id;
         this.description = description;
         this.isOnShoppingList = isOnShoppingList;
         this.isInCart = isInCart;
     }
 
-    public Item(String description, int isOnShoppingList, int isInCart, int imgId) {
+
+    public Item(int id, String description, int isOnShoppingList, int isInCart, String owner, double latitude, double longitude, int imgId ) {
+        this.id = id;
         this.description = description;
         this.isOnShoppingList = isOnShoppingList;
         this.isInCart = isInCart;
@@ -65,6 +77,30 @@ public class Item {
         this.imgId = imgId;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
 
     // API
     public Bitmap getPhoto() {
@@ -74,7 +110,7 @@ public class Item {
         this.photo = photo;
     }
 
-    private Bitmap photo;
+
 
     public void setControlText(int controlId, String value)
     {
@@ -84,6 +120,8 @@ public class Item {
         }
 
     }
+
+
 
     @Override
     public String toString()

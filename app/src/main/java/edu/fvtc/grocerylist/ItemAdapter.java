@@ -100,6 +100,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         holder.getChkItem().setChecked(item.getIsInCart() == 1);
     }*/
 
+
+
     // New binder
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
